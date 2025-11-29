@@ -4,7 +4,7 @@
 ## Installation
 
 ```bash
-go get github.com/afeiship/aiutils
+go get github.com/afeiship/go-ai-utils
 ```
 
 ## Quick Start
@@ -12,6 +12,7 @@ go get github.com/afeiship/aiutils
 ```bash
 # Set environment variable
 export ANTHROPIC_AUTH_TOKEN="your-api-key"
+export ANTHROPIC_BASE_URL="https://api.anthropic.ai"
 ```
 
 ```go
@@ -21,7 +22,7 @@ import (
     "context"
     "fmt"
     "log"
-    "github.com/afeiship/aiutils"
+    "github.com/afeiship/go-ai-utils"
 )
 
 func main() {
