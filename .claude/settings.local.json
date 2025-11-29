@@ -10,7 +10,13 @@
       "Bash(go mod download:*)",
       "Bash(go env:*)",
       "Bash(http_proxy=http://127.0.0.1:9090 https_proxy=http://127.0.0.1:9090 go run:*)",
-      "Bash(env:*)"
+      "Bash(env:*)",
+      "Bash(echo:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(http_proxy=http://127.0.0.1:9090 https_proxy=http://127.0.0.1:9090 go mod tidy:*)",
+      "Bash(go run:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(http_proxy=http://127.0.0.1:9090 https_proxy=http://127.0.0.1:9090 go build:*)"
     ],
     "deny": [],
     "ask": []

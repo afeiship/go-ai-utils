@@ -28,7 +28,6 @@ type ClientOptions struct {
 
 // Client AI客户端
 type Client struct {
-	apiKey  string
 	options ClientOptions
 }
 
@@ -52,34 +51,33 @@ type KeywordsResult struct {
 
 // NewClient 创建新的AI客户端
 func NewClient(options ClientOptions) *Client {
-	// 如果没有提供API key，则从环境变量获取
-	apiKey := options.APIKey
-	if apiKey == "" {
-		apiKey = os.Getenv("ANTHROPIC_AUTH_TOKEN")
-	}
-
 	defaults := getStringConfig().Defaults
-	clientOptions := ClientOptions{
-		APIKey:    apiKey,
-		BaseURL:   defaults.BaseURL,
-		Model:     defaults.Model,
-		MaxTokens: defaults.MaxTokens,
+
+	// APIKey: 用户提供 > 环境变量 > 默认值
+	if options.APIKey == "" {
+		options.APIKey = os.Getenv("ANTHROPIC_AUTH_TOKEN")
 	}
 
-	// 合并用户提供的选项
-	if options.BaseURL != "" {
-		clientOptions.BaseURL = options.BaseURL
+	// BaseURL: 用户提供 > 环境变量 > 默认值
+	if options.BaseURL == "" {
+		options.BaseURL = os.Getenv("ANTHROPIC_BASE_URL")
 	}
-	if options.Model != "" {
-		clientOptions.Model = options.Model
+	if options.BaseURL == "" {
+		options.BaseURL = defaults.BaseURL
 	}
-	if options.MaxTokens > 0 {
-		clientOptions.MaxTokens = options.MaxTokens
+
+	// Model: 用户提供 > 默认值
+	if options.Model == "" {
+		options.Model = defaults.Model
+	}
+
+	// MaxTokens: 用户提供 > 默认值
+	if options.MaxTokens == 0 {
+		options.MaxTokens = defaults.MaxTokens
 	}
 
 	return &Client{
-		apiKey:  clientOptions.APIKey,
-		options: clientOptions,
+		options: options,
 	}
 }
 
@@ -115,7 +113,7 @@ func (o ClientOptions) WithMaxTokens(maxTokens int) ClientOptions {
 // SetOptions 设置客户端选项
 func (c *Client) SetOptions(options ClientOptions) *Client {
 	if options.APIKey != "" {
-		c.apiKey = options.APIKey
+		c.options.APIKey = options.APIKey
 	}
 	if options.BaseURL != "" {
 		c.options.BaseURL = options.BaseURL
@@ -158,7 +156,7 @@ func (c *Client) Keywords(content string, options ...*KeywordsOptions) (*Keyword
 	}
 
 	// 创建Claude客户端
-	claudeClient, err := createClaudeClient(c.apiKey, c.options.BaseURL, c.options.Model, c.options.MaxTokens)
+	claudeClient, err := createClaudeClient(c.options.APIKey, c.options.BaseURL, c.options.Model, c.options.MaxTokens)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Claude client: %w", err)
 	}

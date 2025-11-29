@@ -3,7 +3,6 @@ package aiutils
 import (
 	"embed"
 	"fmt"
-	"os"
 	"strings"
 	"text/template"
 
@@ -155,28 +154,7 @@ func parseKeywordsResponse(response string, count int) ([]string, error) {
 // createClaudeClient 创建Claude客户端
 func createClaudeClient(apiKey, baseURL, model string, maxTokens int) (*claude.Client, error) {
 	if apiKey == "" {
-		apiKey = os.Getenv("ANTHROPIC_AUTH_TOKEN")
-	}
-	if apiKey == "" {
 		return nil, fmt.Errorf("API key is required")
-	}
-
-	// 处理BaseURL
-	if baseURL == "" {
-		baseURL = os.Getenv("ANTHROPIC_BASE_URL")
-	}
-	if baseURL == "" {
-		baseURL = getStringConfig().Defaults.BaseURL
-	}
-
-	// 处理Model
-	if model == "" {
-		model = getStringConfig().Defaults.Model
-	}
-
-	// 处理MaxTokens
-	if maxTokens == 0 {
-		maxTokens = getStringConfig().Defaults.MaxTokens
 	}
 
 	return claude.NewClient(claude.Config{
