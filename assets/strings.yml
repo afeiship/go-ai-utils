@@ -58,4 +58,4 @@ defaults:
   language: "chinese"
   model: "glm-4.5-air"
   max_tokens: 1000
-  base_url: "https://api.anthropic.com"
+  base_url: "https://open.bigmodel.cn/api/anthropic"
