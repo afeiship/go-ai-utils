@@ -1,7 +1,7 @@
 {
   "name": "@jswork/go-ai-utils",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Go utilities for LLM-powered text tasks: keywords, summary, translation, and more.",
   "license": "MIT",
   "scripts": {
