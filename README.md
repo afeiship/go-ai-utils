@@ -68,8 +68,8 @@ result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
     Language: aiutils.LanguageMixed,
 })
 
-// 使用默认配置
-result, err := client.Keywords(ctx, content, nil)
+// 使用默认配置（不需要传nil）
+result, err := client.Keywords(ctx, content)
 
 // 指定数量
 result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{

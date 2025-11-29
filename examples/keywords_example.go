@@ -20,7 +20,7 @@ func main() {
 	client := aiutils.NewClientFromEnv()
 
 	// 默认配置
-	result, err := client.Keywords(ctx, content, nil)
+	result, err := client.Keywords(ctx, content)
 	if err != nil {
 		log.Printf("环境变量方法错误: %v (请确保设置了 ANTHROPIC_AUTH_TOKEN 环境变量)", err)
 	} else {
@@ -35,7 +35,7 @@ func main() {
 	apiKey := "your-api-key" // 请替换为你的Claude API密钥
 	if apiKey != "your-api-key" { // 只有在用户修改了API key时才执行
 		clientWithKey := aiutils.NewClient(apiKey)
-		result, err = clientWithKey.Keywords(ctx, content, nil)
+		result, err = clientWithKey.Keywords(ctx, content)
 		if err != nil {
 			log.Printf("直接传入API Key错误: %v", err)
 		} else {

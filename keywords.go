@@ -96,26 +96,29 @@ func (c *Client) SetOptions(options ClientOptions) *Client {
 }
 
 // Keywords 从文本中提取关键词
-func (c *Client) Keywords(ctx context.Context, content string, options *KeywordsOptions) (*KeywordsResult, error) {
+func (c *Client) Keywords(ctx context.Context, content string, options ...*KeywordsOptions) (*KeywordsResult, error) {
 	if content == "" {
 		return nil, fmt.Errorf("content cannot be empty")
 	}
 
 	// 处理选项
-	if options == nil {
-		options = &KeywordsOptions{}
+	var opts *KeywordsOptions
+	if len(options) > 0 && options[0] != nil {
+		opts = options[0]
+	} else {
+		opts = &KeywordsOptions{}
 	}
 
 	// 设置默认值
-	if options.Count == 0 {
-		options.Count = getStringConfig().Defaults.Count
+	if opts.Count == 0 {
+		opts.Count = getStringConfig().Defaults.Count
 	}
-	if options.Language == "" {
-		options.Language = Language(getStringConfig().Defaults.Language)
+	if opts.Language == "" {
+		opts.Language = Language(getStringConfig().Defaults.Language)
 	}
 
 	// 构建提示词
-	prompt, err := buildPrompt(content, options.Language, options.Count)
+	prompt, err := buildPrompt(content, opts.Language, opts.Count)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build prompt: %w", err)
 	}
@@ -133,7 +136,7 @@ func (c *Client) Keywords(ctx context.Context, content string, options *Keywords
 	}
 
 	// 解析响应
-	keywords, err := parseKeywordsResponse(response, options.Count)
+	keywords, err := parseKeywordsResponse(response, opts.Count)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse response: %w", err)
 	}
@@ -141,6 +144,6 @@ func (c *Client) Keywords(ctx context.Context, content string, options *Keywords
 	return &KeywordsResult{
 		Keywords: keywords,
 		Count:    len(keywords),
-		Language: options.Language,
+		Language: opts.Language,
 	}, nil
 }

@@ -235,44 +235,54 @@ client := client.SetMaxTokens(1500)
 
 ### Client 关键词提取方法
 
-#### Keywords(ctx, content, options) (*KeywordsResult, error)
+#### Keywords(ctx, content, options...) (*KeywordsResult, error)
 **完整方法** - 使用选项进行关键词提取
 
 参数：
 - `ctx context.Context`: 上下文
 - `content string`: 要分析的文本内容
-- `options *KeywordsOptions`: 可选配置对象
+- `options ...*KeywordsOptions`: 可选配置对象，可省略
 
 返回：
 - `*KeywordsResult`: 包含关键词列表、数量和语言的结果
 - `error`: 错误信息
 
 ```go
+// 使用默认配置（不需要传nil）
+result, err := client.Keywords(ctx, content)
+
+// 指定选项
 result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
     Count:    8,
     Language: aiutils.LanguageEnglish,
 })
 ```
 
-#### KeywordsSimple(ctx, content) ([]string, error)
-**简化方法** - 使用默认配置进行关键词提取
+#### 使用示例
 
 ```go
-keywords, err := client.KeywordsSimple(ctx, content)
-```
+// 1. 默认提取（使用默认配置）
+keywords, err := client.Keywords(ctx, content)
+fmt.Printf("关键词: %v\n", keywords)
 
-#### KeywordsWithCount(ctx, content, count) ([]string, error)
-**指定数量方法** - 提取指定数量的关键词
+// 2. 指定关键词数量
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+    Count: 3,
+})
+fmt.Printf("3个关键词: %v\n", result.Keywords)
 
-```go
-keywords, err := client.KeywordsWithCount(ctx, content, 3)
-```
+// 3. 指定语言
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+    Language: aiutils.LanguageEnglish,
+})
+fmt.Printf("英文关键词: %v\n", result.Keywords)
 
-#### KeywordsWithLanguage(ctx, content, language) ([]string, error)
-**指定语言方法** - 提取指定语言的关键词
-
-```go
-keywords, err := client.KeywordsWithLanguage(ctx, content, aiutils.LanguageEnglish)
+// 4. 完整选项
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+    Count:    8,
+    Language: aiutils.LanguageMixed,
+})
+fmt.Printf("提取到 %d 个关键词\n", result.Count)
 ```
 
 ### KeywordsOptions 配置对象
