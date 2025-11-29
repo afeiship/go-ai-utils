@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/afeiship/aiutils"
+	"github.com/afeiship/go-ai-utils"
 )
 
 func main() {

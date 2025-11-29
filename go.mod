@@ -1,4 +1,4 @@
-module github.com/afeiship/aiutils
+module github.com/afeiship/go-ai-utils
 
 go 1.23.0
 
