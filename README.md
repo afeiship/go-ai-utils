@@ -11,7 +11,7 @@ go get github.com/afeiship/aiutils
 
 ```bash
 # Set environment variable
-export ANTHROPIC_AUTH_TOKEN="your-api-key"我
+export ANTHROPIC_AUTH_TOKEN="your-api-key"
 export ANTHROPIC_BASE_URL="https://api.anthropic.ai"
 ```
 
