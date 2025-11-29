@@ -35,13 +35,6 @@ func main() {
     // 创建客户端（从环境变量获取API Key）
     client := aiutils.NewClientFromEnv()
 
-    // 简单提取关键词
-    keywords, err := client.KeywordsSimple(ctx, content)
-    if err != nil {
-        log.Fatal(err)
-    }
-    fmt.Println("关键词:", keywords)
-
     // 使用完整选项
     result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
         Count:    5,
@@ -50,34 +43,52 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Printf("英文关键词: %v\n", result.Keywords)
+    fmt.Printf("提取到 %d 个英文关键词: %v\n", result.Count, result.Keywords)
 }
 ```
 
-#### 高级用法 - 链式配置
+#### 高级用法 - 配置选项
 ```go
-// 链式配置客户端
-client := aiutils.NewClientFromEnv().
-    SetModel("glm-4.5-air").
-    SetMaxTokens(1500)
+// 创建时传入选项
+client := aiutils.NewClient("your-api-key", aiutils.ClientOptions{
+    Model:     "glm-4.5-air",
+    MaxTokens: 1500,
+})
 
-// 不同调用方式
-keywords1, _ := client.KeywordsSimple(ctx, content)
-keywords2, _ := client.KeywordsWithCount(ctx, content, 3)
-keywords3, _ := client.KeywordsWithLanguage(ctx, content, aiutils.LanguageEnglish)
-result, _ := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+// 或者使用SetOptions方法
+client = client.SetOptions(aiutils.ClientOptions{
+    BaseURL:   "https://custom-api.com",
+    Model:     "glm-4.5-air",
+    MaxTokens: 2000,
+})
+
+// 完整的Keywords方法调用
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
     Count:    8,
     Language: aiutils.LanguageMixed,
+})
+
+// 使用默认配置
+result, err := client.Keywords(ctx, content, nil)
+
+// 指定数量
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+    Count: 3,
+})
+
+// 指定语言
+result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+    Language: aiutils.LanguageEnglish,
 })
 ```
 
 #### 特性
 - 🎯 **面向对象设计**: Client + Client.Keywords 模式，更符合Go惯用法
 - 🌍 **多语言支持**: 中文、英文、混合语言关键词提取
-- 🔧 **灵活配置**: 支持链式配置、方法参数等多种方式
-- 📦 **嵌入式模板**: 提示词模板内置，无需外部文件
+- 🔧 **灵活配置**: 支持ClientOptions构造函数参数和SetOptions方法
+- 📦 **嵌入式模板**: YAML提示词模板内置，无需外部文件
 - 🌐 **环境变量支持**: 优先使用环境变量，便于部署
-- 🔗 **链式调用**: 流畅的API设计，支持方法链
+- 🎛️ **统一接口**: 单一的Keywords方法，简化API设计
 
 ## Project Structure
 

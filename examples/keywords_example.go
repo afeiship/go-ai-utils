@@ -18,12 +18,14 @@ func main() {
 	// 设置环境变量: export ANTHROPIC_AUTH_TOKEN="your-api-key"
 	fmt.Println("=== 使用环境变量创建Client ===")
 	client := aiutils.NewClientFromEnv()
-	keywords, err := client.KeywordsSimple(ctx, content)
+
+	// 默认配置
+	result, err := client.Keywords(ctx, content, nil)
 	if err != nil {
 		log.Printf("环境变量方法错误: %v (请确保设置了 ANTHROPIC_AUTH_TOKEN 环境变量)", err)
 	} else {
-		fmt.Println("提取的关键词:")
-		for i, keyword := range keywords {
+		fmt.Printf("提取到 %d 个关键词:\n", result.Count)
+		for i, keyword := range result.Keywords {
 			fmt.Printf("%d. %s\n", i+1, keyword)
 		}
 	}
@@ -33,12 +35,12 @@ func main() {
 	apiKey := "your-api-key" // 请替换为你的Claude API密钥
 	if apiKey != "your-api-key" { // 只有在用户修改了API key时才执行
 		clientWithKey := aiutils.NewClient(apiKey)
-		keywords, err = clientWithKey.KeywordsSimple(ctx, content)
+		result, err = clientWithKey.Keywords(ctx, content, nil)
 		if err != nil {
 			log.Printf("直接传入API Key错误: %v", err)
 		} else {
-			fmt.Println("提取的关键词:")
-			for i, keyword := range keywords {
+			fmt.Printf("提取到 %d 个关键词:\n", result.Count)
+			for i, keyword := range result.Keywords {
 				fmt.Printf("%d. %s\n", i+1, keyword)
 			}
 		}
@@ -48,31 +50,35 @@ func main() {
 
 	// 方法3: 指定关键词数量
 	fmt.Println("\n=== 指定关键词数量 ===")
-	keywords3, err := client.KeywordsWithCount(ctx, content, 3)
+	result, err = client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+		Count: 3,
+	})
 	if err != nil {
 		log.Printf("指定数量错误: %v", err)
 	} else {
 		fmt.Println("提取3个关键词:")
-		for i, keyword := range keywords3 {
+		for i, keyword := range result.Keywords {
 			fmt.Printf("%d. %s\n", i+1, keyword)
 		}
 	}
 
 	// 方法4: 指定语言
 	fmt.Println("\n=== 指定语言 - 英文 ===")
-	keywordsEn, err := client.KeywordsWithLanguage(ctx, content, aiutils.LanguageEnglish)
+	result, err = client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+		Language: aiutils.LanguageEnglish,
+	})
 	if err != nil {
 		log.Printf("英文关键词错误: %v", err)
 	} else {
 		fmt.Println("提取英文关键词:")
-		for i, keyword := range keywordsEn {
+		for i, keyword := range result.Keywords {
 			fmt.Printf("%d. %s\n", i+1, keyword)
 		}
 	}
 
-	// 方法5: 使用完整选项
+	// 方法5: 完整选项配置
 	fmt.Println("\n=== 完整选项配置 ===")
-	result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+	result, err = client.Keywords(ctx, content, &aiutils.KeywordsOptions{
 		Count:    8,
 		Language: aiutils.LanguageMixed,
 	})
@@ -85,37 +91,43 @@ func main() {
 		}
 	}
 
-	// 方法6: 链式配置Client
-	fmt.Println("\n=== 链式配置Client ===")
-	chainedClient := aiutils.NewClientFromEnv().
-		SetModel("glm-4.5-air").
-		SetMaxTokens(1500)
+	// 方法6: 使用SetOptions配置Client + 完整选项
+	fmt.Println("\n=== SetOptions配置Client ===")
+	chainedClient := aiutils.NewClientFromEnv().SetOptions(aiutils.ClientOptions{
+		Model:     "glm-4.5-air",
+		MaxTokens: 1500,
+	})
 
-	keywords, err = chainedClient.KeywordsWithCount(ctx, content, 5)
+	result, err = chainedClient.Keywords(ctx, content, &aiutils.KeywordsOptions{
+		Count:    5,
+		Language: aiutils.LanguageChinese,
+	})
 	if err != nil {
-		log.Printf("链式配置错误: %v", err)
+		log.Printf("SetOptions配置错误: %v", err)
 	} else {
-		fmt.Println("链式配置提取的关键词:")
-		for i, keyword := range keywords {
+		fmt.Println("SetOptions配置提取的关键词:")
+		for i, keyword := range result.Keywords {
 			fmt.Printf("%d. %s\n", i+1, keyword)
 		}
 	}
 
-	// 方法7: 创建自定义Client
+	// 方法7: 创建自定义Client + SetOptions
 	fmt.Println("\n=== 自定义Client配置 ===")
-	customClient := aiutils.NewClientWithOptions(
-		"", // 空字符串表示使用环境变量
-		"https://api.anthropic.com",
-		"glm-4.5-air",
-		2000,
-	)
+	customClient := aiutils.NewClient("your-api-key", aiutils.ClientOptions{
+		BaseURL:   "https://api.anthropic.com",
+		Model:     "glm-4.5-air",
+		MaxTokens: 2000,
+	}) // 请替换为实际API Key
 
-	keywords, err = customClient.KeywordsWithLanguage(ctx, content, aiutils.LanguageChinese)
+	result, err = customClient.Keywords(ctx, content, &aiutils.KeywordsOptions{
+		Count:    6,
+		Language: aiutils.LanguageChinese,
+	})
 	if err != nil {
 		log.Printf("自定义Client错误: %v", err)
 	} else {
-		fmt.Println("自定义Client提取的中文关键词:")
-		for i, keyword := range keywords {
+		fmt.Printf("自定义Client提取的 %d 个中文关键词:\n", result.Count)
+		for i, keyword := range result.Keywords {
 			fmt.Printf("%d. %s\n", i+1, keyword)
 		}
 	}

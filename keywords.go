@@ -14,12 +14,20 @@ const (
 	LanguageMixed   Language = "mixed"
 )
 
+// ClientOptions 客户端配置选项
+type ClientOptions struct {
+	// BaseURL API基础URL
+	BaseURL string
+	// Model 使用的模型
+	Model string
+	// MaxTokens 最大token数
+	MaxTokens int
+}
+
 // Client AI客户端
 type Client struct {
-	apiKey    string
-	baseURL   string
-	model     string
-	maxTokens int
+	apiKey string
+	options ClientOptions
 }
 
 // KeywordsOptions 关键词提取选项
@@ -41,50 +49,49 @@ type KeywordsResult struct {
 }
 
 // NewClient 创建新的AI客户端
-func NewClient(apiKey string) *Client {
-	return &Client{
-		apiKey:    apiKey,
-		baseURL:   getStringConfig().Defaults.BaseURL,
-		model:     getStringConfig().Defaults.Model,
-		maxTokens: getStringConfig().Defaults.MaxTokens,
+func NewClient(apiKey string, options ...ClientOptions) *Client {
+	defaults := getStringConfig().Defaults
+	clientOptions := ClientOptions{
+		BaseURL:   defaults.BaseURL,
+		Model:     defaults.Model,
+		MaxTokens: defaults.MaxTokens,
 	}
-}
 
-// NewClientWithOptions 使用选项创建AI客户端
-func NewClientWithOptions(apiKey, baseURL, model string, maxTokens int) *Client {
-	client := NewClient(apiKey)
-	if baseURL != "" {
-		client.baseURL = baseURL
+	// 如果传入了选项，则合并
+	if len(options) > 0 {
+		if options[0].BaseURL != "" {
+			clientOptions.BaseURL = options[0].BaseURL
+		}
+		if options[0].Model != "" {
+			clientOptions.Model = options[0].Model
+		}
+		if options[0].MaxTokens > 0 {
+			clientOptions.MaxTokens = options[0].MaxTokens
+		}
 	}
-	if model != "" {
-		client.model = model
+
+	return &Client{
+		apiKey:  apiKey,
+		options: clientOptions,
 	}
-	if maxTokens > 0 {
-		client.maxTokens = maxTokens
-	}
-	return client
 }
 
 // NewClientFromEnv 从环境变量创建AI客户端
-func NewClientFromEnv() *Client {
-	return NewClient("")
+func NewClientFromEnv(options ...ClientOptions) *Client {
+	return NewClient("", options...)
 }
 
-// SetBaseURL 设置API基础URL
-func (c *Client) SetBaseURL(baseURL string) *Client {
-	c.baseURL = baseURL
-	return c
-}
-
-// SetModel 设置模型
-func (c *Client) SetModel(model string) *Client {
-	c.model = model
-	return c
-}
-
-// SetMaxTokens 设置最大token数
-func (c *Client) SetMaxTokens(maxTokens int) *Client {
-	c.maxTokens = maxTokens
+// SetOptions 设置客户端选项
+func (c *Client) SetOptions(options ClientOptions) *Client {
+	if options.BaseURL != "" {
+		c.options.BaseURL = options.BaseURL
+	}
+	if options.Model != "" {
+		c.options.Model = options.Model
+	}
+	if options.MaxTokens > 0 {
+		c.options.MaxTokens = options.MaxTokens
+	}
 	return c
 }
 
@@ -114,7 +121,7 @@ func (c *Client) Keywords(ctx context.Context, content string, options *Keywords
 	}
 
 	// 创建Claude客户端
-	claudeClient, err := createClaudeClient(c.apiKey, c.baseURL, c.model, c.maxTokens)
+	claudeClient, err := createClaudeClient(c.apiKey, c.options.BaseURL, c.options.Model, c.options.MaxTokens)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Claude client: %w", err)
 	}
@@ -136,35 +143,4 @@ func (c *Client) Keywords(ctx context.Context, content string, options *Keywords
 		Count:    len(keywords),
 		Language: options.Language,
 	}, nil
-}
-
-// KeywordsSimple 简化版关键词提取
-func (c *Client) KeywordsSimple(ctx context.Context, content string) ([]string, error) {
-	result, err := c.Keywords(ctx, content, nil)
-	if err != nil {
-		return nil, err
-	}
-	return result.Keywords, nil
-}
-
-// KeywordsWithCount 指定关键词数量的提取
-func (c *Client) KeywordsWithCount(ctx context.Context, content string, count int) ([]string, error) {
-	result, err := c.Keywords(ctx, content, &KeywordsOptions{
-		Count: count,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.Keywords, nil
-}
-
-// KeywordsWithLanguage 指定语言的关键词提取
-func (c *Client) KeywordsWithLanguage(ctx context.Context, content string, language Language) ([]string, error) {
-	result, err := c.Keywords(ctx, content, &KeywordsOptions{
-		Language: language,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.Keywords, nil
 }
