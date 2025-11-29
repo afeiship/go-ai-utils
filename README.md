@@ -19,19 +19,17 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.ai"
 package main
 
 import (
-    "context"
-    "fmt"
+      "fmt"
     "log"
     "github.com/afeiship/go-ai-utils"
 )
 
 func main() {
-    ctx := context.Background()
     content := "人工智能是计算机科学的一个分支，它企图了解智能的实质..."
 
     // Create client and extract keywords
-    client := aiutils.NewClientFromEnv()
-    result, err := client.Keywords(ctx, content)
+    client := aiutils.NewClient(aiutils.NewClientOptions())
+    result, err := client.Keywords(content)
     if err != nil {
         log.Fatal(err)
     }
@@ -44,13 +42,20 @@ func main() {
 
 ```go
 // With options
-result, err := client.Keywords(ctx, content, &aiutils.KeywordsOptions{
+result, err := client.Keywords(content, &aiutils.KeywordsOptions{
     Count:    5,
     Language: aiutils.LanguageEnglish,
 })
 
-// Configure client
-client := aiutils.NewClient("api-key", aiutils.ClientOptions{
+// Configure client with chainable helpers
+client := aiutils.NewClient(aiutils.NewClientOptions().
+    WithAPIKey("api-key").
+    WithModel("glm-4.5-air").
+    WithMaxTokens(1500)
+
+// Or directly
+client := aiutils.NewClient(aiutils.ClientOptions{
+    APIKey:    "api-key",
     Model:     "glm-4.5-air",
     MaxTokens: 1500,
 })

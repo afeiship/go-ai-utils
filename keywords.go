@@ -1,8 +1,8 @@
 package aiutils
 
 import (
-	"context"
 	"fmt"
+	"os"
 )
 
 // Language 支持的语言类型
@@ -16,6 +16,8 @@ const (
 
 // ClientOptions 客户端配置选项
 type ClientOptions struct {
+	// APIKey Claude API密钥
+	APIKey string
 	// BaseURL API基础URL
 	BaseURL string
 	// Model 使用的模型
@@ -49,40 +51,72 @@ type KeywordsResult struct {
 }
 
 // NewClient 创建新的AI客户端
-func NewClient(apiKey string, options ...ClientOptions) *Client {
+func NewClient(options ClientOptions) *Client {
+	// 如果没有提供API key，则从环境变量获取
+	apiKey := options.APIKey
+	if apiKey == "" {
+		apiKey = os.Getenv("ANTHROPIC_AUTH_TOKEN")
+	}
+
 	defaults := getStringConfig().Defaults
 	clientOptions := ClientOptions{
+		APIKey:    apiKey,
 		BaseURL:   defaults.BaseURL,
 		Model:     defaults.Model,
 		MaxTokens: defaults.MaxTokens,
 	}
 
-	// 如果传入了选项，则合并
-	if len(options) > 0 {
-		if options[0].BaseURL != "" {
-			clientOptions.BaseURL = options[0].BaseURL
-		}
-		if options[0].Model != "" {
-			clientOptions.Model = options[0].Model
-		}
-		if options[0].MaxTokens > 0 {
-			clientOptions.MaxTokens = options[0].MaxTokens
-		}
+	// 合并用户提供的选项
+	if options.BaseURL != "" {
+		clientOptions.BaseURL = options.BaseURL
+	}
+	if options.Model != "" {
+		clientOptions.Model = options.Model
+	}
+	if options.MaxTokens > 0 {
+		clientOptions.MaxTokens = options.MaxTokens
 	}
 
 	return &Client{
-		apiKey:  apiKey,
+		apiKey:  clientOptions.APIKey,
 		options: clientOptions,
 	}
 }
 
-// NewClientFromEnv 从环境变量创建AI客户端
-func NewClientFromEnv(options ...ClientOptions) *Client {
-	return NewClient("", options...)
+// NewClientOptions 创建新的客户端选项
+func NewClientOptions() ClientOptions {
+	return ClientOptions{}
+}
+
+// WithAPIKey 设置API Key
+func (o ClientOptions) WithAPIKey(apiKey string) ClientOptions {
+	o.APIKey = apiKey
+	return o
+}
+
+// WithBaseURL 设置BaseURL
+func (o ClientOptions) WithBaseURL(baseURL string) ClientOptions {
+	o.BaseURL = baseURL
+	return o
+}
+
+// WithModel 设置Model
+func (o ClientOptions) WithModel(model string) ClientOptions {
+	o.Model = model
+	return o
+}
+
+// WithMaxTokens 设置MaxTokens
+func (o ClientOptions) WithMaxTokens(maxTokens int) ClientOptions {
+	o.MaxTokens = maxTokens
+	return o
 }
 
 // SetOptions 设置客户端选项
 func (c *Client) SetOptions(options ClientOptions) *Client {
+	if options.APIKey != "" {
+		c.apiKey = options.APIKey
+	}
 	if options.BaseURL != "" {
 		c.options.BaseURL = options.BaseURL
 	}
@@ -96,11 +130,12 @@ func (c *Client) SetOptions(options ClientOptions) *Client {
 }
 
 // Keywords 从文本中提取关键词
-func (c *Client) Keywords(ctx context.Context, content string, options ...*KeywordsOptions) (*KeywordsResult, error) {
+func (c *Client) Keywords(content string, options ...*KeywordsOptions) (*KeywordsResult, error) {
 	if content == "" {
 		return nil, fmt.Errorf("content cannot be empty")
 	}
 
+	
 	// 处理选项
 	var opts *KeywordsOptions
 	if len(options) > 0 && options[0] != nil {
