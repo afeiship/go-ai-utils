@@ -14,7 +14,7 @@ func main() {
 	client := aiutils.NewClient(aiutils.ClientOptions{})
 
 	result, err := client.Keywords(content, &aiutils.KeywordsOptions{
-		Count: 3,
+		Count:    3,
 		Language: aiutils.LanguageChinese,
 	})
 
