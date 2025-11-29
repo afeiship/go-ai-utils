@@ -1,0 +1,61 @@
+# AI关键词提取提示词模板
+prompts:
+  # 中文关键词提取提示词
+  chinese_keywords: |
+    请分析以下文本，提取出{{.Count}}个最重要的关键词。
+
+    要求：
+    1. 关键词应该能够概括文本的核心内容
+    2. 关键词应该是名词或名词短语
+    3. 避免过于宽泛或过于具体的词汇
+    4. 关键词使用中文
+
+    文本内容：
+    {{.Content}}
+
+    请直接返回关键词，每行一个关键词，不要包含其他说明文字。
+
+  # 英文关键词提取提示词
+  english_keywords: |
+    Please analyze the following text and extract the {{.Count}} most important keywords.
+
+    Requirements:
+    1. Keywords should summarize the core content of the text
+    2. Keywords should be nouns or noun phrases
+    3. Avoid overly broad or overly specific terms
+    4. Keywords should be in English
+
+    Text content:
+    {{.Content}}
+
+    Please return the keywords directly, one per line, without any additional explanations.
+
+  # 混合语言关键词提取提示词
+  mixed_keywords: |
+    请分析以下文本，提取出{{.Count}}个最重要的关键词。
+
+    要求：
+    1. 关键词应该能够概括文本的核心内容
+    2. 关键词应该是名词或名词短语
+    3. 避免过于宽泛或过于具体的词汇
+    4. 关键词可以使用中文或英文，根据文本内容选择最合适的语言
+
+    文本内容：
+    {{.Content}}
+
+    Please return the keywords directly, one per line, without any additional explanations.
+    请直接返回关键词，每行一个关键词，不要包含其他说明文字。
+
+# 语言指令模板
+language_instructions:
+  chinese: "关键词使用中文"
+  english: "关键词使用英文"
+  mixed: "关键词可以使用中文或英文，根据文本内容选择最合适的语言"
+
+# 默认配置
+defaults:
+  count: 5
+  language: "chinese"
+  model: "glm-4.5-air"
+  max_tokens: 1000
+  base_url: "https://api.anthropic.com"

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go list:*)",
+      "Bash(go build:*)",
+      "Bash(go get:*)",
+      "Bash(tree:*)",
+      "Bash(http_proxy=http://127.0.0.1:9090 https_proxy=http://127.0.0.1:9090 go get:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
