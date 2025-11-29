@@ -28,7 +28,7 @@ type ClientOptions struct {
 
 // Client AI客户端
 type Client struct {
-	apiKey string
+	apiKey  string
 	options ClientOptions
 }
 
@@ -135,7 +135,6 @@ func (c *Client) Keywords(content string, options ...*KeywordsOptions) (*Keyword
 		return nil, fmt.Errorf("content cannot be empty")
 	}
 
-	
 	// 处理选项
 	var opts *KeywordsOptions
 	if len(options) > 0 && options[0] != nil {
