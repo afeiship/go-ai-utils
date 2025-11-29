@@ -10,7 +10,8 @@
       "Bash(go vet:*)",
       "Bash(http_proxy=http://127.0.0.1:9090 https_proxy=http://127.0.0.1:9090 go get:*)",
       "Bash(mv:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

@@ -87,48 +87,48 @@ func NewClientOptions() ClientOptions {
 }
 
 // WithAPIKey 设置API Key
-func (o ClientOptions) WithAPIKey(apiKey string) ClientOptions {
-	o.APIKey = apiKey
-	return o
+func (opts ClientOptions) WithAPIKey(apiKey string) ClientOptions {
+	opts.APIKey = apiKey
+	return opts
 }
 
 // WithBaseURL 设置BaseURL
-func (o ClientOptions) WithBaseURL(baseURL string) ClientOptions {
-	o.BaseURL = baseURL
-	return o
+func (opts ClientOptions) WithBaseURL(baseURL string) ClientOptions {
+	opts.BaseURL = baseURL
+	return opts
 }
 
 // WithModel 设置Model
-func (o ClientOptions) WithModel(model string) ClientOptions {
-	o.Model = model
-	return o
+func (opts ClientOptions) WithModel(model string) ClientOptions {
+	opts.Model = model
+	return opts
 }
 
 // WithMaxTokens 设置MaxTokens
-func (o ClientOptions) WithMaxTokens(maxTokens int) ClientOptions {
-	o.MaxTokens = maxTokens
-	return o
+func (opts ClientOptions) WithMaxTokens(maxTokens int) ClientOptions {
+	opts.MaxTokens = maxTokens
+	return opts
 }
 
 // SetOptions 设置客户端选项
-func (c *Client) SetOptions(options ClientOptions) *Client {
+func (client *Client) SetOptions(options ClientOptions) *Client {
 	if options.APIKey != "" {
-		c.options.APIKey = options.APIKey
+		client.options.APIKey = options.APIKey
 	}
 	if options.BaseURL != "" {
-		c.options.BaseURL = options.BaseURL
+		client.options.BaseURL = options.BaseURL
 	}
 	if options.Model != "" {
-		c.options.Model = options.Model
+		client.options.Model = options.Model
 	}
 	if options.MaxTokens > 0 {
-		c.options.MaxTokens = options.MaxTokens
+		client.options.MaxTokens = options.MaxTokens
 	}
-	return c
+	return client
 }
 
 // Keywords 从文本中提取关键词
-func (c *Client) Keywords(content string, options ...*KeywordsOptions) (*KeywordsResult, error) {
+func (client *Client) Keywords(content string, options ...*KeywordsOptions) (*KeywordsResult, error) {
 	if content == "" {
 		return nil, fmt.Errorf("content cannot be empty")
 	}
@@ -156,7 +156,7 @@ func (c *Client) Keywords(content string, options ...*KeywordsOptions) (*Keyword
 	}
 
 	// 创建Claude客户端
-	claudeClient, err := createClaudeClient(c.options.APIKey, c.options.BaseURL, c.options.Model, c.options.MaxTokens)
+	claudeClient, err := createClaudeClient(client.options.APIKey, client.options.BaseURL, client.options.Model, client.options.MaxTokens)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Claude client: %w", err)
 	}
